@@ -1,3 +1,4 @@
+import os.path
 import _queue
 import re
 import tempfile
@@ -38,10 +39,12 @@ class FlipperNested:
             self.save = args.save
             self.preserve = args.preserve
             self.uid = args.uid
+            self.local = args.local
         if not args or args and not args.file:
             self.connection = FlipperBridge(args.port)
             self.extract_nonces_from_flipper()
         else:
+            self.nonceManifestFilePath = args.file
             self.extract_nonces_from_file(args.file)
 
     def parse_file(self, contents):
@@ -75,7 +78,12 @@ class FlipperNested:
                     if sec not in self.nonces[key_type].keys():
                         self.nonces[key_type][sec] = []
                     file = tempfile.NamedTemporaryFile(delete=False)
-                    value = self.connection.file_read(values[1])
+                    if self.local:
+                        manifestPath = os.path.dirname(self.nonceManifestFilePath.name)
+                        path = (manifestPath + '/' + values[1].replace('/ext/nfc/.nested/', '')).replace('/', '\\') #replace is for the sake of windows paths
+                        value = open(path, "rb").read()
+                    else:
+                        value  = self.connection.file_read(values[1])
                     open(file.name, "wb+").write(b"\n".join(value.split(b"\n")[4:]))
                     if self.save:
                         open(values[1].rsplit("/", 1)[1], "wb+").write(value)

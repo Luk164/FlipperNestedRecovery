@@ -10,6 +10,7 @@ def main():
     parser.add_argument("--progress", action="store_true", help="Show key recovery progress bar")
     parser.add_argument("--save", action="store_true", help="Debug: Save nonces/keys from Flipper")
     parser.add_argument("--preserve", action="store_true", help="Debug: Don't remove nonces after recovery")
+    parser.add_argument("--local", action="store_true", help="Debug: Run locally. Assumes nonce file locations to be in same folder as --file argument")
     parser.add_argument("--file", type=argparse.FileType("r"), help="Debug: Recover keys from local .nonces file")
     parser.set_defaults(debug=False)
     args = parser.parse_args()
